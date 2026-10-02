@@ -28,6 +28,7 @@ The setup script downloads official **Foundry v1.8.4 for Windows amd64** and **S
 | Optional Ex7 | `.\scripts\lab.ps1 challenge` | Run the Unstoppable solution |
 | Formatting | `.\scripts\lab.ps1 fmt` | Check formatting of the completed exercise files without changing them |
 | CLI demonstration | `.\scripts\lab.ps1 demo` | Deploy and perform Ex1/Ex3 on a fresh local Anvil |
+| Tier 2 | `.\scripts\lab.ps1 sepolia` | Deploy to Sepolia and verify all three contracts after credentials are configured |
 
 The demo binds Anvil to `127.0.0.1:18545`, refuses to reuse an occupied port, and stops its own node afterward. It uses only the public Anvil fixture accounts and writes transaction receipts and balance snapshots to `evidence/`. Those fixture accounts are for disposable local chains only.
 
@@ -42,6 +43,22 @@ forge test -vv  # all suites
 ```
 
 See [EXERCISES.md](EXERCISES.md) for the original task descriptions and individual CLI commands.
+
+## Tier 2 — Sepolia deployment and verification (pending credentials)
+
+Fill `PRIVATE_KEY`, `SEPOLIA_RPC_URL`, and `ETHERSCAN_API_KEY` in the ignored local `.env` file, using [.env.example](.env.example) as the template. The wallet must contain Sepolia test ETH. Keep the private key and API key out of the repository and screenshots.
+
+```powershell
+.\scripts\lab.ps1 sepolia
+```
+
+The helper checks for Ethereum Sepolia chain ID `11155111`, rejects zero and known default Anvil fixture keys, deploys the three contracts and grants the vault its minting role, then verifies their source on Etherscan. It writes public addresses, transaction hashes, verification outcomes, and explorer links to `evidence/sepolia.json`. If deployment succeeded but verification failed, retry without deploying again:
+
+```powershell
+.\scripts\deploy-sepolia.ps1 -Mode VerifyOnly
+```
+
+Existing deployment records prevent accidental redeployment. An interrupted or partial broadcast must be inspected and resumed separately. The helper's syntax and credential rejection were checked locally; live Sepolia deployment and verification have **not** been executed. Once they succeed, add the generated public evidence and update this pending status before the final course submission.
 
 ## Architecture
 

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('doctor', 'core', 'test', 'exercise', 'challenge', 'fmt', 'demo')]
+    [ValidateSet('doctor', 'core', 'test', 'exercise', 'challenge', 'fmt', 'demo', 'sepolia')]
     [string]$Task = 'test'
 )
 $ErrorActionPreference = 'Stop'
@@ -35,6 +35,7 @@ try {
             forge fmt --check src/exercises/OverCollateralizedVault.sol test/exercises/01_LoopTasks.t.sol test/exercises/02_InvariantTasks.t.sol test/exercises/04_OverCollateralEdgeCases.t.sol test/challenges/Unstoppable.t.sol
         }
         'demo' { & (Join-Path $PSScriptRoot 'demo-local.ps1'); return }
+        'sepolia' { & (Join-Path $PSScriptRoot 'deploy-sepolia.ps1'); return }
     }
     if ($LASTEXITCODE -ne 0) { throw "Lab task '$Task' failed (exit $LASTEXITCODE)." }
 } finally {
