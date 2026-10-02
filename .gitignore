@@ -4,6 +4,8 @@ broadcast/
 .env
 demo-state.json
 .DS_Store
+.tools/
+evidence/anvil*.log
 
 # lib/ is deliberately not ignored: forge-std and openzeppelin-contracts are vendored into
 # lib/ with the repo, so students can clone and run make test straight away without going

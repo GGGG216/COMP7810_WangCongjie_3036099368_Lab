@@ -16,7 +16,7 @@ import {Vault} from "../../src/Vault.sol";
 ///         That is what a stablecoin should be tested like — you will never guess the
 ///         order an attacker does things in.
 ///
-///         Acceptance: make exercise (it should be red until you are finished)
+///         Acceptance: make exercise.
 ///
 /// @dev How it works: Foundry picks functions from the handler at random, picks random
 ///      arguments, and calls them N times in a row; after each round it runs every
@@ -62,14 +62,20 @@ contract VaultHandler is Test {
         ghost_deposits++;
     }
 
-    /// TODO Ex6.1 — implement redemption
-    /// @dev Requirements:
-    ///       1) pick one user at random (a user may hold 0 sUSD — if so, return early)
-    ///       2) bound amount to [1, that user's sUSD balance]
-    ///       3) call vault.redeem(amount) as that user
-    ///       4) do not forget approve — redeem needs no allowance, but deposit does
-    ///      Hint: the two parameters have no names yet. Name them first.
-    function redeem(uint256, uint256) external {}
+    /// @dev Ex6.1: redeem only the selected user's available sUSD. Unlike deposit,
+    ///      redemption requires no approval because the vault holds MINTER_ROLE.
+    function redeem(uint256 userSeed, uint256 amount) external {
+        address user = users[bound(userSeed, 0, users.length - 1)];
+
+        uint256 balance = stable.balanceOf(user);
+        if (balance == 0) return;
+        amount = bound(amount, 1, balance);
+
+        vm.prank(user);
+        vault.redeem(amount);
+
+        ghost_redeems++;
+    }
 }
 
 contract InvariantTasksTest is Test {
@@ -96,19 +102,58 @@ contract InvariantTasksTest is Test {
         targetContract(address(handler));
     }
 
-    /// TODO Ex6.2 — the main invariant: collateral is never less than the supply
-    /// @dev The assertion below is wrong on purpose (it asserts the supply is 0), which is
-    ///      why it goes red. Turn it into the property you actually want to defend. When it
-    ///      fails, Foundry prints the counterexample call sequence — walk through that
-    ///      sequence and you will see exactly how the invariant broke.
+    /// @dev Ex6.2: every coin remains backed. Exact equality is the stronger property
+    ///      in this handler's scope: deposits and redemptions only, with no donations
+    ///      or privileged mint/burn calls.
     function invariant_CollateralBacksSupply() public view {
-        assertEq(stable.totalSupply(), 0, "TODO Ex6.2");
+        assertEq(vault.totalCollateral(), stable.totalSupply(), "collateral must equal supply");
     }
 
-    /// TODO Ex6.3 — a second invariant: the vault itself never holds sUSD
-    /// @dev Think about why this has to hold: the vault only ever mints sUSD to users and
-    ///      should keep none for itself. If this one breaks, what does that mean?
+    /// @dev Ex6.3: minting and burning occur in the user's balance. This property is
+    ///      scoped to the handler, since ordinary ERC-20 transfers could send sUSD
+    ///      directly to the vault in a broader action space.
     function invariant_VaultHoldsNoStablecoin() public view {
-        assertEq(stable.balanceOf(address(vault)), 1, "TODO Ex6.3");
+        assertEq(stable.balanceOf(address(vault)), 0, "vault must not retain stablecoins");
+    }
+
+    /// @dev Deterministic handler coverage avoids relying on a random sequence to
+    ///      happen to exercise both successful actions.
+    function test_Handler_DepositAndRedeemForEveryUser() public {
+        for (uint256 i; i < 3; ++i) {
+            address user = handler.users(i);
+            handler.deposit(i, 100e6);
+            assertEq(stable.balanceOf(user), 100e6);
+            assertEq(stable.allowance(user, address(vault)), 0);
+
+            handler.redeem(i, 100e6);
+            assertEq(stable.balanceOf(user), 0);
+            assertEq(usdc.balanceOf(user), 1_000_000e6);
+        }
+
+        assertEq(handler.ghost_deposits(), 3);
+        assertEq(handler.ghost_redeems(), 3);
+        assertEq(stable.totalSupply(), 0);
+        assertEq(vault.totalCollateral(), 0);
+    }
+
+    function test_Handler_RedeemWithNoBalanceReturnsEarly() public {
+        handler.redeem(type(uint256).max, type(uint256).max);
+        assertEq(handler.ghost_redeems(), 0);
+        assertEq(stable.totalSupply(), 0);
+        assertEq(vault.totalCollateral(), 0);
+    }
+
+    function testFuzz_Handler_RedeemIsBoundedByUserBalance(uint256 userSeed, uint256 raw) public {
+        uint256 userIndex = bound(userSeed, 0, 2);
+        address user = handler.users(userIndex);
+        handler.deposit(userIndex, 100e6);
+
+        uint256 amount = bound(raw, 1, 100e6);
+        handler.redeem(userIndex, raw);
+
+        assertEq(stable.balanceOf(user), 100e6 - amount);
+        assertEq(usdc.balanceOf(user), 1_000_000e6 - 100e6 + amount);
+        assertEq(handler.ghost_redeems(), 1);
+        assertEq(vault.totalCollateral(), stable.totalSupply());
     }
 }

@@ -1,0 +1,78 @@
+No files changed, compilation skipped
+
+Ran 2 tests for test/challenges/Unstoppable.t.sol:UnstoppableChallenge
+[PASS] test_assertInitialState() (gas: 177287)
+[PASS] test_unstoppable() (gas: 170719)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 23.05ms (7.37ms CPU time)
+
+Ran 10 tests for test/exercises/03_OverCollateralTasks.t.sol:OverCollateralTasksTest
+[PASS] testFuzz_Ex5_SupplyBackedByValue(uint96) (runs: 256, μ: 274899, ~: 220636)
+[PASS] test_Ex5_CollateralValue_ConvertsDecimalsCorrectly() (gas: 174089)
+[PASS] test_Ex5_Liquidate_CapsSeizureAtAvailableCollateral() (gas: 419186)
+[PASS] test_Ex5_Liquidate_RevertsWhenHealthy() (gas: 286836)
+[PASS] test_Ex5_Liquidate_SeizesCollateral() (gas: 475459)
+[PASS] test_Ex5_Mint_ExactRatioBoundary() (gas: 438797)
+[PASS] test_Ex5_Mint_HappyPath() (gas: 284275)
+[PASS] test_Ex5_Mint_RevertsWhenUndercollateralized() (gas: 195825)
+[PASS] test_Ex5_Redeem_AtExactRatioSucceeds() (gas: 327158)
+[PASS] test_Ex5_Redeem_RevertsIfItBreachesRatio() (gas: 288104)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 146.97ms (180.35ms CPU time)
+
+Ran 7 tests for test/Stablecoin.t.sol:StablecoinTest
+[PASS] testFuzz_Invariant_CollateralBacksSupply(uint96) (runs: 256, μ: 252720, ~: 252710)
+[PASS] test_Deposit_MintsOneToOne() (gas: 271640)
+[PASS] test_Mint_RevertsForNonMinter() (gas: 43275)
+[PASS] test_Pause_BlocksTransfers() (gas: 316234)
+[PASS] test_Redeem_BurnsAndReturnsCollateral() (gas: 334921)
+[PASS] test_Redeem_RevertsOnEmptyVault() (gas: 37575)
+[PASS] test_Redeem_RevertsOnZeroAmount() (gas: 32141)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 153.30ms (186.05ms CPU time)
+
+Ran 14 tests for test/exercises/04_OverCollateralEdgeCases.t.sol:OverCollateralEdgeCasesTest
+[PASS] test_CollateralValueAvoidsIntermediateOverflow() (gas: 44179)
+[PASS] test_CollateralValueRoundsDownAtSmallestStableUnit() (gas: 22503)
+[PASS] test_ExtremePriceDropCapsBeforeUnboundedSeizureOverflows() (gas: 539112)
+[PASS] test_LiquidationJustBelow120PercentLeavesSurplusWithBorrower() (gas: 586183)
+[PASS] test_LiquidationRejectsExactly120Percent() (gas: 435905)
+[PASS] test_LiquidationRejectsZeroDebt() (gas: 233967)
+[PASS] test_LiquidationRoundsOnlyAfterApplyingBonus() (gas: 493871)
+[PASS] test_MintAtExact150PercentRejectsOneMoreUnitAndRollsBack() (gas: 404373)
+[PASS] test_PausedMintAndLiquidationRollBackAccounting() (gas: 578873)
+[PASS] test_RedeemCannotTakeAnotherUsersCollateral() (gas: 236712)
+[PASS] test_RedeemOneWeiBeyond150PercentRollsBack() (gas: 374527)
+[PASS] test_RepayingAllDebtAllowsFullWithdrawalWithoutOracle() (gas: 464358)
+[PASS] test_UnfundedLiquidatorCannotBurnBorrowersStablecoin() (gas: 430853)
+[PASS] test_ZeroAmountsRejected() (gas: 52142)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 156.77ms (120.30ms CPU time)
+
+Ran 7 tests for test/exercises/01_LoopTasks.t.sol:LoopTasksTest
+[PASS] test_Ex2_DecimalsTrap() (gas: 276124)
+[PASS] test_Ex2_DepositIncreasesSupplyByExactly(uint96) (runs: 256, μ: 489986, ~: 489976)
+[PASS] test_Ex4_AttackerCannotBurnOthersBalance() (gas: 300471)
+[PASS] test_Ex4_Mint_RevertsForNonMinter() (gas: 61816)
+[PASS] test_Ex4_Pause_BlocksRedeem() (gas: 499478)
+[PASS] test_Ex4_Pause_BlocksTransfers() (gas: 441748)
+[PASS] test_Ex4_VaultHoldsTheKey_CanBurnAnyonesBalance() (gas: 340799)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 157.41ms (211.29ms CPU time)
+
+Ran 4 tests for test/exercises/02_InvariantTasks.t.sol:InvariantTasksTest
+[PASS]
+InvariantTasksTest invariants:
+[PASS] invariant_CollateralBacksSupply
+[PASS] invariant_VaultHoldsNoStablecoin
+ InvariantTasksTest invariants (runs: 256, calls: 128000, reverts: 0)
+
+╭--------------+----------+-------+---------+----------╮
+| Contract     | Selector | Calls | Reverts | Discards |
++======================================================+
+| VaultHandler | deposit  | 64233 | 0       | 0        |
+|--------------+----------+-------+---------+----------|
+| VaultHandler | redeem   | 63767 | 0       | 0        |
+╰--------------+----------+-------+---------+----------╯
+
+[PASS] testFuzz_Handler_RedeemIsBoundedByUserBalance(uint256,uint256) (runs: 256, μ: 303199, ~: 305184)
+[PASS] test_Handler_DepositAndRedeemForEveryUser() (gas: 823993)
+[PASS] test_Handler_RedeemWithNoBalanceReturnsEarly() (gas: 59072)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 15.49s (15.58s CPU time)
+
+Ran 6 test suites in 15.50s (16.13s CPU time): 44 tests passed, 0 failed, 0 skipped (44 total tests)

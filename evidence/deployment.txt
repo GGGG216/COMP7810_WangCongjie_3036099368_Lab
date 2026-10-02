@@ -1,0 +1,46 @@
+No files changed, compilation skipped
+2026-10-02T02:20:25.982952Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for lib/forge-std/src/StdAssertions.sol
+2026-10-02T02:20:25.983768Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for lib/forge-std/src/StdError.sol
+2026-10-02T02:20:25.983881Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for lib/forge-std/src/StdInvariant.sol
+2026-10-02T02:20:25.984685Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for lib/forge-std/src/StdToml.sol
+2026-10-02T02:20:25.985020Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for lib/forge-std/src/Test.sol
+2026-10-02T02:20:25.991061Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/Stablecoin.t.sol
+2026-10-02T02:20:25.991189Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/challenges/Unstoppable.t.sol
+2026-10-02T02:20:25.991304Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/exercises/01_LoopTasks.t.sol
+2026-10-02T02:20:25.991418Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/exercises/02_InvariantTasks.t.sol
+2026-10-02T02:20:25.991581Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/exercises/03_OverCollateralTasks.t.sol
+2026-10-02T02:20:25.991737Z  WARN foundry_evm_traces::debug::sources: failed to parse contract definitions for test/exercises/04_OverCollateralEdgeCases.t.sol
+2026-10-02T02:20:26.020516Z  WARN evm::traces::external: etherscan config not found
+Script ran successfully.
+
+== Logs ==
+  admin            : 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+  MockUSDC         : 0x5FbDB2315678afecb367f032d93F642f64180aa3
+  SimpleStablecoin : 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+  Vault            : 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+
+## Setting up 1 EVM.
+2026-10-02T02:20:27.276107Z  WARN evm::traces::external: etherscan config not found
+
+==========================
+
+Chain 31337
+
+Estimated max fee per gas: 2.000000001 gwei
+Estimated base fee per gas: 1 gwei
+Estimated max priority fee per gas: 0.000000001 gwei
+
+Estimated total gas used for script: 2587105
+
+Estimated amount required: 0.005174210002587105 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: D:/=_=/7810/stablecoin-lab-2026/broadcast\Deploy.s.sol\31337\run-latest.json
+
+Sensitive values saved to: D:/=_=/7810/stablecoin-lab-2026/cache\Deploy.s.sol\31337\run-latest.json

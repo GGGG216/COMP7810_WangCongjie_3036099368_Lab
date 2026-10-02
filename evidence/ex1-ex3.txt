@@ -1,0 +1,65 @@
+Local lab run: 2026-10-02T02:20:25.5267070Z
+Fresh Anvil, RPC http://127.0.0.1:18545, chain ID 31337
+forge script script/Deploy.s.sol:Deploy --rpc-url <local Anvil> --broadcast
+cast rpc eth_accounts --rpc-url http://127.0.0.1:18545
+mUSDC=0x5FbDB2315678afecb367f032d93F642f64180aa3
+sUSD=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+Vault=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+User=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Attacker=0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 faucet(address,uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 1000000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex1 faucet 1000 mUSDC : status=0x1, transaction=0x20b8620ff1d61e6f47899411b29d74bae040e38bb6b48d4ef07afb1e16ac1561
+cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 approve(address,uint256) 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 1000000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex1 approve 1000 mUSDC : status=0x1, transaction=0x19fd987579ca562dc76797b5851472aff9b0b26d76c1092778f6d946da5fe75d
+cast send 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 deposit(uint256) 1000000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex1 deposit 1000 mUSDC : status=0x1, transaction=0x9b3ea614cc3efb482c2bd2c17e318343127c86e355b300be72f4b06628fa4029
+
+=== Ex1 after deposit (all amounts in 6-decimal base units) ===
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 totalSupply()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 1000000000
+cast call 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 totalCollateral()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 1000000000
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 1000000000
+cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 0
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 0
+cast send 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 redeem(uint256) 250000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex1 redeem 250 sUSD : status=0x1, transaction=0x8f6172eabd3ea9a7906cc7c5b2b42fd5391805425d766c9535dec8b8c8e022a1
+
+=== Ex1 after redeem (all amounts in 6-decimal base units) ===
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 totalSupply()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 750000000
+cast call 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 totalCollateral()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 750000000
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 750000000
+cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 250000000
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 0
+cast send 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 mint(address,uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 1000000000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex3 unauthorized mint correctly reverted : status=0x0, transaction=0xbf82cce69a1d00533c7ee7ffd075ad73f9c2f21f9291d4188bcfea0057022cab
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 MINTER_ROLE()(bytes32) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+cast send 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 grantRole(bytes32,address) 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex3 admin grants MINTER_ROLE : status=0x1, transaction=0x005952f38b19bb1ed1359955c939a0998d4326ca47a55cf0f707b45a3540224f
+cast send 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 mint(address,uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 1000000000000 --private-key <public-Anvil-fixture> --gas-limit 500000 --json --rpc-url http://127.0.0.1:18545
+Ex3 privileged mint without collateral : status=0x1, transaction=0xdae913653576ab6b8a1725ed3d236e5af6906de06ffee6dc86689c9d3a01f46c
+
+=== Ex3 unbacked issuance (all amounts in 6-decimal base units) ===
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 totalSupply()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 1000750000000
+cast call 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 totalCollateral()(uint256) --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 750000000
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 750000000
+cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 250000000
+cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 --private-key <public-Anvil-fixture> --rpc-url http://127.0.0.1:18545
+  -> 1000000000000
+
+Ex3 result: totalSupply = 1000750000000; totalCollateral = 750000000
+Supply = 1,000,750 sUSD; collateral = 750 mUSDC; unbacked gap = 1,000,000 tokens.
+This demonstrates broken backing; no secondary-market price is measured.
+PASS: Ex1 mint/redeem loop and Ex3 role-compromise demonstration.

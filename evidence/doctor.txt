@@ -1,0 +1,25 @@
+forge Version: 1.8.4
+Commit SHA: 50af4efe189dc64bad2b75ed6990b835de66c4ae
+Build Timestamp: 2026-10-01T13:50:42.600348400Z (1790862642)
+Build Profile: dist
+cast Version: 1.8.4
+Commit SHA: 50af4efe189dc64bad2b75ed6990b835de66c4ae
+Build Timestamp: 2026-10-01T13:50:42.600348400Z (1790862642)
+Build Profile: dist
+anvil Version: 1.8.4
+Commit SHA: 50af4efe189dc64bad2b75ed6990b835de66c4ae
+Build Timestamp: 2026-10-01T13:50:42.600348400Z (1790862642)
+Build Profile: dist
+No files changed, compilation skipped
+
+Ran 7 tests for test/Stablecoin.t.sol:StablecoinTest
+[PASS] testFuzz_Invariant_CollateralBacksSupply(uint96) (runs: 256, μ: 252724, ~: 252746)
+[PASS] test_Deposit_MintsOneToOne() (gas: 271640)
+[PASS] test_Mint_RevertsForNonMinter() (gas: 43275)
+[PASS] test_Pause_BlocksTransfers() (gas: 316234)
+[PASS] test_Redeem_BurnsAndReturnsCollateral() (gas: 334921)
+[PASS] test_Redeem_RevertsOnEmptyVault() (gas: 37575)
+[PASS] test_Redeem_RevertsOnZeroAmount() (gas: 32141)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 28.03ms (35.90ms CPU time)
+
+Ran 1 test suite in 31.10ms (28.03ms CPU time): 7 tests passed, 0 failed, 0 skipped (7 total tests)
