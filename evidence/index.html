@@ -97,26 +97,26 @@ Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 15.49s (15.58s CPU 
 Ran 6 test suites in 15.50s (16.13s CPU time): 44 tests passed, 0 failed, 0 skipped (44 total tests)
 </pre></section>
 <section id="demo"><h2>Ex3: supply exceeds collateral after a privileged mint</h2>
-<p class="note">Fresh local Anvil run: 2026-10-02T02:20:34.1254501Z · All displayed amounts use 6-decimal base units.</p>
+<p class="note">Fresh local Anvil run: 2026-10-05T09:40:20.3427782Z · All displayed amounts use 6-decimal base units.</p>
 <div class="cards"><div class="card"><div class="label">SUSD TOTAL SUPPLY</div><div class="number bad">1,000,750,000,000</div><div>1,000,750 sUSD tokens</div></div>
 <div class="card"><div class="label">VAULT TOTAL COLLATERAL</div><div class="number">750,000,000</div><div>750 mUSDC tokens</div></div></div>
 <p><strong>Unbacked gap: 1,000,000 tokens.</strong> The same caller's mint first reverted without MINTER_ROLE, then succeeded after the admin granted that role. This proves broken backing; no market price was measured.</p>
 <table><thead><tr><th>Checkpoint</th><th>totalSupply()</th><th>totalCollateral()</th><th>User sUSD</th></tr></thead><tbody><tr><td>Ex1 after deposit</td><td>1,000,000,000</td><td>1,000,000,000</td><td>1,000,000,000</td></tr><tr><td>Ex1 after redeem</td><td>750,000,000</td><td>750,000,000</td><td>750,000,000</td></tr><tr><td>Ex3 unbacked issuance</td><td>1,000,750,000,000</td><td>750,000,000</td><td>750,000,000</td></tr></tbody></table>
 <pre>=== Ex3 unbacked issuance (all amounts in 6-decimal base units) ===
-cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 totalSupply()(uint256) --private-key &lt;public-Anvil-fixture&gt; --rpc-url http://127.0.0.1:18545
+cast call 0xD7fe5f770040DC87659B09024deEa52085916103 totalSupply()(uint256) --private-key &lt;ephemeral-local-key&gt; --rpc-url http://127.0.0.1:18545
   -&gt; 1000750000000
-cast call 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 totalCollateral()(uint256) --private-key &lt;public-Anvil-fixture&gt; --rpc-url http://127.0.0.1:18545
+cast call 0x399ba45Bc8EF67668aEEd1315CC3fD69b8A3e51a totalCollateral()(uint256) --private-key &lt;ephemeral-local-key&gt; --rpc-url http://127.0.0.1:18545
   -&gt; 750000000
-cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key &lt;public-Anvil-fixture&gt; --rpc-url http://127.0.0.1:18545
+cast call 0xD7fe5f770040DC87659B09024deEa52085916103 balanceOf(address)(uint256) 0x76aB15A7B615e7D338A6daE105Fd4889260eF00C --private-key &lt;ephemeral-local-key&gt; --rpc-url http://127.0.0.1:18545
   -&gt; 750000000
-cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 balanceOf(address)(uint256) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key &lt;public-Anvil-fixture&gt; --rpc-url http://127.0.0.1:18545
+cast call 0x9a42Ea1E56c3F88e7a81091B70F42508fE7aFB4f balanceOf(address)(uint256) 0x76aB15A7B615e7D338A6daE105Fd4889260eF00C --private-key &lt;ephemeral-local-key&gt; --rpc-url http://127.0.0.1:18545
   -&gt; 250000000
-cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 balanceOf(address)(uint256) 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 --private-key &lt;public-Anvil-fixture&gt; --rpc-url http://127.0.0.1:18545
+cast call 0xD7fe5f770040DC87659B09024deEa52085916103 balanceOf(address)(uint256) 0xDF53E7bd59a1574901B12AeD48D112004e78Cfc6 --private-key &lt;ephemeral-local-key&gt; --rpc-url http://127.0.0.1:18545
   -&gt; 1000000000000
 
 Ex3 result: totalSupply = 1000750000000; totalCollateral = 750000000
 Supply = 1,000,750 sUSD; collateral = 750 mUSDC; unbacked gap = 1,000,000 tokens.
 This demonstrates broken backing; no secondary-market price is measured.
 PASS: Ex1 mint/redeem loop and Ex3 role-compromise demonstration.
-</pre><h2>Transaction receipts</h2><table><thead><tr><th>Step</th><th>Status</th><th>Transaction hash</th></tr></thead><tbody><tr><td>Ex1 faucet 1000 mUSDC</td><td>0x1</td><td class="hash">0x20b8620ff1d61e6f47899411b29d74bae040e38bb6b48d4ef07afb1e16ac1561</td></tr><tr><td>Ex1 approve 1000 mUSDC</td><td>0x1</td><td class="hash">0x19fd987579ca562dc76797b5851472aff9b0b26d76c1092778f6d946da5fe75d</td></tr><tr><td>Ex1 deposit 1000 mUSDC</td><td>0x1</td><td class="hash">0x9b3ea614cc3efb482c2bd2c17e318343127c86e355b300be72f4b06628fa4029</td></tr><tr><td>Ex1 redeem 250 sUSD</td><td>0x1</td><td class="hash">0x8f6172eabd3ea9a7906cc7c5b2b42fd5391805425d766c9535dec8b8c8e022a1</td></tr><tr><td>Ex3 unauthorized mint correctly reverted</td><td>0x0</td><td class="hash">0xbf82cce69a1d00533c7ee7ffd075ad73f9c2f21f9291d4188bcfea0057022cab</td></tr><tr><td>Ex3 admin grants MINTER_ROLE</td><td>0x1</td><td class="hash">0x005952f38b19bb1ed1359955c939a0998d4326ca47a55cf0f707b45a3540224f</td></tr><tr><td>Ex3 privileged mint without collateral</td><td>0x1</td><td class="hash">0xdae913653576ab6b8a1725ed3d236e5af6906de06ffee6dc86689c9d3a01f46c</td></tr></tbody></table>
+</pre><h2>Transaction receipts</h2><table><thead><tr><th>Step</th><th>Status</th><th>Transaction hash</th></tr></thead><tbody><tr><td>Ex1 faucet 1000 mUSDC</td><td>0x1</td><td class="hash">0x1ba727b010f07f3a9f502ab976281ba2e1644b1d986dfce318f959e511aee219</td></tr><tr><td>Ex1 approve 1000 mUSDC</td><td>0x1</td><td class="hash">0x000b19cd8891478987c1a98e3e2322fa777172493a03c263b8ff84deef609c5c</td></tr><tr><td>Ex1 deposit 1000 mUSDC</td><td>0x1</td><td class="hash">0x4a05880369cfb58f252791ba82060158703304e04d6a76dcab273514dd6d609a</td></tr><tr><td>Ex1 redeem 250 sUSD</td><td>0x1</td><td class="hash">0xb41f16b3ab745a341cacf2bd7ddfb8800a042c3b5c975576f4e3370cc35d3027</td></tr><tr><td>Ex3 unauthorized mint correctly reverted</td><td>0x0</td><td class="hash">0x9ddd978023052e977f2adac6000ede4297c7d7664521b8f3d80863585a7938df</td></tr><tr><td>Ex3 admin grants MINTER_ROLE</td><td>0x1</td><td class="hash">0x587547c0adae58332fc5a2d806ee6b9ba184f7415f68f34b0098709cfa0e9fec</td></tr><tr><td>Ex3 privileged mint without collateral</td><td>0x1</td><td class="hash">0x903f26cd9f61f010b12bdde654de2e8e4caa1f7a8a602116befbaff0697136d5</td></tr></tbody></table>
 </section></main><script>document.body.dataset.view=new URLSearchParams(location.search).get('view')==='demo'?'demo':'tests';</script></html>

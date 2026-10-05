@@ -2,6 +2,8 @@
 
 Submission repository: [GGGG216/COMP7810_WangCongjie_3036099368_Lab](https://github.com/GGGG216/COMP7810_WangCongjie_3036099368_Lab).
 
+**Latest Assignment Two format:** upload **one project ZIP, including `lib/`, to Moodle** by **16 October 2026, 23:55**, and paste all three verified Sepolia addresses and Etherscan links into Moodle's text box. GitHub is a supporting copy. Sepolia is graded at **20%**; Ex7 is optional and unmarked. See [SUBMISSION.md](SUBMISSION.md) for the requirement mapping, packaging command, and remaining steps.
+
 Completed from [hgwoops/stablecoin-lab-2026](https://github.com/hgwoops/stablecoin-lab-2026), upstream commit [`971ae77107f750153208c495bb000673c9560403`](https://github.com/hgwoops/stablecoin-lab-2026/tree/971ae77107f750153208c495bb000673c9560403). This lab demonstrates collateral accounting, mint/redeem permissions, liquidation, and the limits of a stablecoin's backing invariant.
 
 **Ex0–Ex6 and the optional Ex7 challenge are complete.** The full Foundry run reports **44 passed, 0 failed, 0 skipped across 6 suites**. Both invariant properties passed in a grouped invariant result: 256 runs at depth 500, totaling 128,000 handler calls with zero reverts. The recorded deployment uses local Anvil. **Tier 2 Sepolia deployment and Etherscan verification are pending:** a test-ETH-funded wallet and verification credentials have not yet been configured. This pending item is listed separately so local evidence is not mistaken for testnet deployment evidence.
@@ -30,7 +32,7 @@ The setup script downloads official **Foundry v1.8.4 for Windows amd64** and **S
 | CLI demonstration | `.\scripts\lab.ps1 demo` | Deploy and perform Ex1/Ex3 on a fresh local Anvil |
 | Tier 2 | `.\scripts\lab.ps1 sepolia` | Deploy to Sepolia and verify all three contracts after credentials are configured |
 
-The demo binds Anvil to `127.0.0.1:18545`, refuses to reuse an occupied port, and stops its own node afterward. It uses only the public Anvil fixture accounts and writes transaction receipts and balance snapshots to `evidence/`. Those fixture accounts are for disposable local chains only.
+The demo binds Anvil to `127.0.0.1:18545`, refuses to reuse an occupied port, and stops its own node afterward. It creates two temporary random accounts in memory, funds them only on its local Anvil instance, and writes public transaction receipts and balance snapshots to `evidence/`. No private-key literal or seed phrase is stored in the submitted scripts. For the manual Makefile deployment, supply `ANVIL_KEY` through your local shell environment.
 
 The original Bash/Make workflow remains available on Linux, macOS, WSL, or Codespaces with Foundry installed:
 
@@ -63,6 +65,20 @@ Existing deployment records prevent accidental redeployment. An interrupted or p
 ## Architecture
 
 The fiat loop uses six decimals for both collateral (`MockUSDC`) and stablecoin (`SimpleStablecoin`). A successful deposit increases collateral and supply by the same amount; redemption burns the caller's sUSD and returns the same quantity of collateral.
+
+Portable text diagram (also readable without a Mermaid renderer):
+
+```text
+User -- approve collateral --> MockUSDC (6 decimals)
+User -- deposit(amount) ----> Vault -- transferFrom(user) --> MockUSDC
+                              |
+                              +-- mint(user, amount) -----> SimpleStablecoin
+User -- redeem(amount) -----> Vault -- burn(user, amount) -> SimpleStablecoin
+                              +-- return collateral ------> User
+
+Admin -- grant/revoke MINTER_ROLE --> SimpleStablecoin <-- MINTER_ROLE -- Vault
+Admin -- pause/unpause ------------> SimpleStablecoin (transfers/mint/burn)
+```
 
 ```mermaid
 sequenceDiagram

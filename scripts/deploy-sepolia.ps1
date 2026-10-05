@@ -120,15 +120,32 @@ function Assert-PrivateKey {
         throw 'PRIVATE_KEY is zero or outside the valid secp256k1 range. Replace the .env placeholder with your dedicated Sepolia key.'
     }
     $env:PRIVATE_KEY = "0x$hex"
-    $publicMnemonic = 'test test test test test test test test test test test junk'
-    foreach ($index in 0..19) {
-        $fixture = Invoke-LabTool $castExe @('wallet', 'private-key', $publicMnemonic, "$index")
-        if ($fixture.ExitCode -ne 0 -or $fixture.Output.Trim() -notmatch '^0x[0-9a-fA-F]{64}$') {
-            throw 'Could not validate the public Anvil fixture key denylist; no broadcast was attempted.'
-        }
-        if ($env:PRIVATE_KEY -eq $fixture.Output.Trim()) {
-            throw 'Refusing a publicly known Anvil fixture key. Use your own dedicated Sepolia wallet.'
-        }
+    # One-way fingerprints reject public fixture keys without bundling keys or seed phrases.
+    $fixtureFingerprints = @(
+        '60a09e4357868c1e9b801052726d061c370429f723db84523ed58ac354f6eb8a',
+        '095101cf732c298a0ce0320b9de704209cdd8640b70d8fdf4e5be51aa2eb272e',
+        'bb4978fbe7638de8e6ee13d9a59a5fb047beb0f0ee059fe166541b1f96b6af63',
+        'f02322197a196ceb746aa52cee2a869abf0fe231c4d6d050a8a5f02c6625a1d4',
+        '5de22089c247b9b2722ec5c33498e6bc481b1faba85f4da957f8b84679fcf88c',
+        '59feecfa04eb096ba44eed297e4239fa32d8840cbc1ffb8ff2f7fd8e8e0edd38',
+        'b69d88ff1ad5834ab1d8ed45f20d72b6ccf3429c9ccc75b93d14ca0ee00dec16',
+        'b6b9ee08c38f62da71fa150a8ada4a7a09c7d3c4a9f6445e51e5a4b2c6395368',
+        'be394de37f9d6cf6682434e9f15a4f891eca9b614bf79da2da22a8e48a658fcd',
+        'dd0102d1cd0c6ac702573e3e7551fc6cec26596b6287348804c1b0f9544b5bf9',
+        'bc695e76adbd4ba589f63b5522e4cff1617857f6255c87950e52ef51c2d18000',
+        'f08cf7b46c09669b731db4160bd42c7327126eac2caf35ba299cd92bf086aef4',
+        '7112de5abbaaf6185c02a8af80086678d3bd7cfae2b692e1f06e07d2bf95f063',
+        'c9af1927cd58e92d438303f3f1d4b1ed246b01060b2abdbca149d2321a2d04bd',
+        '9ebbe88c52f8681820a94a6501aa00fa230094dfc40147a908f53538e8cfa3a6',
+        '9794bae81f0d5dd24f7025d1bfbb9f5541f685d6903a2a0a8267c9c6e57f8487',
+        '89fdd4bd49fc0e2a4b08d8379d7906d328c871b1399680e16d1008de30b16ed2',
+        '97bc0c40d645cfaa2f3b3eb6527201816192c0f3056fd4ec191da8c1db901b02',
+        '609101d4dd3170f57ff777c34aff90d822bb450ad30ef420017137b8625a8c28',
+        '7d2c370c3a5748fad23c20a93abaa2b19badc0c8a0e7d6336b529170645011c0'
+    )
+    $fingerprint = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($env:PRIVATE_KEY))).ToLowerInvariant()
+    if ($fingerprint -in $fixtureFingerprints) {
+        throw 'Refusing a publicly known Anvil fixture key. Use your own dedicated Sepolia wallet.'
     }
 }
 

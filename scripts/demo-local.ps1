@@ -19,10 +19,10 @@ function Write-Demo([string]$Message) {
 }
 
 function Invoke-Cast([string[]]$CastArgs, [bool]$AllowFailure = $false) {
-    if ($CastArgs[0] -eq 'call') { $CastArgs += @('--private-key', $env:PRIVATE_KEY) }
+    if ($CastArgs[0] -eq 'call') { $CastArgs += @('--private-key', $ephemeralAdminKey) }
     $displayArgs = $CastArgs.Clone()
     for ($i = 0; $i -lt $displayArgs.Length - 1; $i++) {
-        if ($displayArgs[$i] -eq '--private-key') { $displayArgs[$i + 1] = '<public-Anvil-fixture>' }
+        if ($displayArgs[$i] -eq '--private-key') { $displayArgs[$i + 1] = '<ephemeral-local-key>' }
     }
     Write-Demo ('cast ' + ($displayArgs -join ' ') + " --rpc-url $rpc")
     $result = & cast @CastArgs --rpc-url $rpc 2>&1
@@ -33,10 +33,9 @@ function Invoke-Cast([string[]]$CastArgs, [bool]$AllowFailure = $false) {
 }
 
 function Send-Demo([string]$Label, [string]$From, [string]$To, [string]$Signature, [string[]]$Values, [bool]$ExpectSuccess = $true) {
-    # Explicit public fixture keys avoid Cast 1.8.4's default-keystore lookup on
-    # a fresh Windows installation. These accounts belong only to this local chain.
-    $fixtureKey = if ($From -eq $admin) { $env:PRIVATE_KEY } elseif ($From -eq $attacker) {
-        '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
+    # Fresh keys exist only in memory, and their accounts are funded only on Anvil.
+    $fixtureKey = if ($From -eq $admin) { $ephemeralAdminKey } elseif ($From -eq $attacker) {
+        $ephemeralAttackerKey
     } else { throw 'Unknown local fixture account.' }
     $argsForCast = @('send', $To, $Signature) + $Values + @('--private-key', $fixtureKey, '--gas-limit', '500000', '--json')
     $receipt = (Invoke-Cast -CastArgs $argsForCast -AllowFailure (-not $ExpectSuccess)) | ConvertFrom-Json
@@ -70,6 +69,17 @@ function Save-Snapshot([string]$Stage) {
 }
 
 try {
+    $walletResult = & cast wallet new --number 2 --json 2>$null
+    if ($LASTEXITCODE -ne 0) { throw 'Could not generate temporary local test accounts.' }
+    $wallets = $walletResult | ConvertFrom-Json
+    if ($wallets.PSObject.Properties.Name -contains 'schema_version') { $wallets = $wallets.data }
+    if (@($wallets).Count -ne 2) { throw 'Expected two temporary local test accounts.' }
+    $ephemeralAdminKey = $wallets[0].private_key
+    $ephemeralAttackerKey = $wallets[1].private_key
+    $attacker = $wallets[1].address
+    foreach ($key in @($ephemeralAdminKey, $ephemeralAttackerKey)) {
+        if ($key -notmatch '^0x[0-9a-fA-F]{64}$') { throw 'Invalid temporary local key.' }
+    }
     # Refuse to reuse an existing node: the demonstration must start from a blank chain.
     $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
     try { $listener.Start() } finally { $listener.Stop() }
@@ -86,8 +96,12 @@ try {
     }
     if (-not $ready) { throw 'Anvil did not become ready.' }
     $env:NO_COLOR = '1'
-    # Public Anvil account 0 fixture, supplied by the upstream Makefile. Never funded externally.
-    $env:PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+    foreach ($wallet in $wallets) {
+        $fundRequest = @{jsonrpc='2.0'; id=1; method='anvil_setBalance'; params=@($wallet.address, '0x21e19e0c9bab2400000')} | ConvertTo-Json -Compress
+        $fundResult = Invoke-RestMethod -Uri $rpc -Method Post -ContentType 'application/json' -Body $fundRequest
+        if ($null -ne $fundResult.error) { throw 'Could not fund the temporary local account.' }
+    }
+    $env:PRIVATE_KEY = $ephemeralAdminKey
     Write-Demo "Local lab run: $([DateTime]::UtcNow.ToString('o'))"
     Write-Demo "Fresh Anvil, RPC $rpc, chain ID 31337"
     Write-Demo 'forge script script/Deploy.s.sol:Deploy --rpc-url <local Anvil> --broadcast'
@@ -101,8 +115,6 @@ try {
     $stable = [regex]::Match($deployText, 'SimpleStablecoin\s*:\s*(0x[0-9a-fA-F]{40})').Groups[1].Value
     $vault = [regex]::Match($deployText, 'Vault\s*:\s*(0x[0-9a-fA-F]{40})').Groups[1].Value
     if (-not $admin -or -not $usdc -or -not $stable -or -not $vault) { throw 'Could not read deployment addresses.' }
-    $accounts = (Invoke-Cast -CastArgs @('rpc', 'eth_accounts')) | ConvertFrom-Json
-    $attacker = $accounts[1]
     Write-Demo "mUSDC=$usdc`nsUSD=$stable`nVault=$vault`nUser=$admin`nAttacker=$attacker"
 
     Send-Demo 'Ex1 faucet 1000 mUSDC' $admin $usdc 'faucet(address,uint256)' @($admin, '1000000000')

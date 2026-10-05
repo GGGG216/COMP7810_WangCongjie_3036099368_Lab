@@ -1,9 +1,8 @@
 SHELL := /bin/bash
 
-# Anvil default account 0 (public key, local demos only, never for real funds)
-ANVIL_KEY  := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-# Anvil default account 1 — used to play the attacker who holds no MINTER_ROLE
-ATTACK_KEY := 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+# Supply local-chain keys through the shell environment; never store them in the ZIP.
+ANVIL_KEY  ?=
+ATTACK_KEY ?=
 RPC        := http://127.0.0.1:8545
 
 .PHONY: help setup doctor install-foundry test exercise challenge fmt anvil deploy-anvil snapshot restore mint balance clean
@@ -39,6 +38,7 @@ anvil: ## Start a local chain (in a second terminal)
 	anvil
 
 deploy-anvil: ## Deploy to the local chain
+	@test -n "$(ANVIL_KEY)" || (echo "Export ANVIL_KEY for your local Anvil account first"; exit 1)
 	PRIVATE_KEY=$(ANVIL_KEY) forge script script/Deploy.s.sol:Deploy \
 		--rpc-url $(RPC) --broadcast
 
