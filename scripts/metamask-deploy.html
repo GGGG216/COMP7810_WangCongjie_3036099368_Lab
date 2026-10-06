@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COMP7810 · Sepolia deployment</title>
+<style>
+body{font:17px/1.6 system-ui,sans-serif;background:#f3f6fb;color:#15253b;max-width:940px;margin:48px auto;padding:0 24px}h1{line-height:1.2}section{background:white;border:1px solid #dae2ed;border-radius:16px;padding:24px;margin:20px 0}button{background:#164b9c;color:white;padding:13px 20px;border:0;border-radius:8px;font:inherit;cursor:pointer}button:disabled{background:#8191a8;cursor:default}code,pre{overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px}li{margin:12px 0}.tag{color:#185737;font-weight:700}#status{white-space:pre-wrap}small{color:#526278}a{color:#164b9c}
+</style>
+<p class="tag">COMP7810 · Ethereum Sepolia only · Chain 11155111</p>
+<h1>Deploy your stablecoin lab</h1>
+<p>Keep your private key in MetaMask. This local page requests four transactions, each with <strong>0 ETH transferred</strong>. Network gas fees use Sepolia test ETH.</p>
+<section><h2>1. Connect your wallet</h2><button id="connect">Connect MetaMask</button><p id="account">Open this page in Edge with MetaMask enabled.</p></section>
+<section><h2>2. Approve the four transactions</h2><ol id="steps"><li>Deploy MockUSDC (test collateral)</li><li>Deploy SimpleStablecoin (your account is admin)</li><li>Deploy Vault (links the two tokens)</li><li>Grant MINTER_ROLE to Vault</li></ol><button id="deploy" disabled>Deploy / resume on Sepolia</button><p><small>Review each MetaMask request and confirm it. Wait for this page to report completion. If interrupted, resume here; existing hashes are retained.</small></p></section>
+<section><h2>Progress</h2><div id="status" role="status">Ready to connect.</div><pre id="results"></pre><button id="validate" disabled>Check receipts and save evidence</button></section>
+<script>
+const $=id=>document.getElementById(id), TOKEN='__SESSION_TOKEN__';
+const CHAIN='0xaa36a7', names=['MockUSDC','SimpleStablecoin','Vault','GrantRole'];
+let wallet,account,manifest,hashes={},addresses={},busy=false;
+const providers=[];
+window.addEventListener('eip6963:announceProvider',e=>providers.push(e.detail));
+window.dispatchEvent(new Event('eip6963:requestProvider'));
+const word=a=>{if(!/^0x[0-9a-f]{40}$/i.test(a))throw Error('Invalid address');return a.slice(2).toLowerCase().padStart(64,'0')};
+const status=t=>$('status').textContent=t;
+async function api(path,data){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-Lab-Session':TOKEN},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw Error(j.error);return j;}
+function show(){ $('results').textContent=names.filter(n=>hashes[n]).map(n=>`${n}\nTransaction: ${hashes[n]}${addresses[n]?'\nAddress: '+addresses[n]:''}`).join('\n\n');}
+async function check(){if(await wallet.request({method:'eth_chainId'})!==CHAIN)throw Error('Select Sepolia in MetaMask, then reconnect.');const a=await wallet.request({method:'eth_accounts'});if(!a[0]||a[0].toLowerCase()!==account.toLowerCase())throw Error('Wallet account changed. Reconnect before continuing.');}
+async function receipt(hash){for(let i=0;i<180;i++){const details=await api('/transaction',{hash});if(!details.pending){if(details.receipt.status!=='0x1')throw Error('Transaction failed. Stop and inspect the saved hash.');return details;}await new Promise(r=>setTimeout(r,2000));}throw Error('Still pending. Resume later; do not send a replacement from this page.');}
+async function checkTx(name,hash,expected){
+  const {transaction:tx,receipt:r}=await receipt(hash);
+  if(tx.from?.toLowerCase()!==account.toLowerCase())throw Error(`Select the original deploying account ${tx.from} in MetaMask, then reconnect.`);
+  if(tx.chainId==null||BigInt(tx.chainId)!==BigInt(CHAIN))throw Error(`${name}: saved transaction has an unexpected chain ID.`);
+  if(tx.value==null||BigInt(tx.value)!==0n)throw Error(`${name}: saved transaction unexpectedly transfers ETH.`);
+  if(tx.input?.toLowerCase()!==expected.data.toLowerCase())throw Error(`${name}: saved transaction bytecode or constructor arguments differ from this lab.`);
+  if((tx.to||'').toLowerCase()!==(expected.to||'').toLowerCase())throw Error(`${name}: saved transaction destination does not match.`);
+  if(name!=='GrantRole'){word(r.contractAddress);addresses[name]=r.contractAddress;}show();
+}
+$('connect').onclick=async()=>{try{
+  const discovered=providers.find(p=>p.info.rdns==='io.metamask');
+  wallet=discovered?.provider||window.ethereum?.providers?.find(p=>p.isMetaMask)||window.ethereum;
+  if(!wallet)throw Error('MetaMask not detected. Open this URL in Edge with MetaMask enabled.');
+  if(await wallet.request({method:'eth_chainId'})!==CHAIN)throw Error('Select Sepolia in MetaMask, then click Connect again.');
+  [account]=await wallet.request({method:'eth_requestAccounts'});word(account);
+  manifest=await (await fetch('/manifest')).json();hashes=manifest.progress;addresses={};
+  const cached=JSON.parse(localStorage.getItem('comp7810-sepolia-hashes')||'{}');
+  for(const n of names){if(cached[n]&&!hashes[n]){await api('/record',{step:n,hash:cached[n]});hashes[n]=cached[n];}}
+  const balance=await wallet.request({method:'eth_getBalance',params:[account,'latest']});
+  $('account').textContent=`${account}\nSepolia balance: ${(Number(BigInt(balance))/1e18).toFixed(6)} test ETH`;
+  $('deploy').disabled=false;$('validate').disabled=names.some(n=>!hashes[n]);show();status('Connected to Sepolia. Click Deploy / resume and review each MetaMask request.');
+}catch(e){status(e.message);}};
+$('deploy').onclick=async()=>{if(busy)return;busy=true;$('deploy').disabled=true;$('connect').disabled=true;try{
+  for(const name of names){await check();let data,to;
+    if(name==='MockUSDC')data=manifest.bytecode.MockUSDC;
+    if(name==='SimpleStablecoin')data=manifest.bytecode.SimpleStablecoin+word(account);
+    if(name==='Vault')data=manifest.bytecode.Vault+word(addresses.MockUSDC)+word(addresses.SimpleStablecoin);
+    if(name==='GrantRole'){to=addresses.SimpleStablecoin;data='0x2f2ff15d'+manifest.role+word(addresses.Vault);}
+    const tx={from:account,data,value:'0x0',chainId:CHAIN,...(to?{to}:{})};
+    if(!hashes[name]){status(`${name}: review and confirm the Sepolia request in MetaMask.`);
+      const gas=await wallet.request({method:'eth_estimateGas',params:[tx]});tx.gas='0x'+(BigInt(gas)*120n/100n).toString(16);
+      await check();const hash=await wallet.request({method:'eth_sendTransaction',params:[tx]});
+      hashes[name]=hash;localStorage.setItem('comp7810-sepolia-hashes',JSON.stringify(hashes));
+      await api('/record',{step:name,hash});show();
+    }
+    status(`${name}: waiting for its receipt…`);await checkTx(name,hashes[name],tx);
+  }
+  $('validate').disabled=false;status('All four transactions confirmed. Checking receipts independently…');
+  await api('/validate',{});status('Deployment complete. Public evidence saved. Return to Codex for Etherscan verification and the final submission ZIP.');
+}catch(e){status(e.message+'\nExisting transaction hashes are preserved.');}finally{busy=false;$('deploy').disabled=false;$('connect').disabled=false;}};
+$('validate').onclick=async()=>{try{status('Checking Sepolia receipts…');await api('/validate',{});status('Deployment complete. Public evidence saved. Return to Codex for source verification.');}catch(e){status(e.message);}};
+</script></html>

@@ -1,0 +1,16 @@
+COMP7810A Assignment Two - Stablecoin Lab
+Wang Congjie, 3036099368
+
+Network: Ethereum Sepolia (chain ID 11155111)
+
+MockUSDC
+Address: 0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc
+Verified source: https://sepolia.etherscan.io/address/0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc#code
+
+SimpleStablecoin
+Address: 0xdbc37a8762e1ba519b196f289ce89833a1d721f0
+Verified source: https://sepolia.etherscan.io/address/0xdbc37a8762e1ba519b196f289ce89833a1d721f0#code
+
+Vault
+Address: 0x1886bab8801f805111ff5921eb6dfe77873ba077
+Verified source: https://sepolia.etherscan.io/address/0x1886bab8801f805111ff5921eb6dfe77873ba077#code

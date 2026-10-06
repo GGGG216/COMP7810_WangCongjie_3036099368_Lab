@@ -1,0 +1,52 @@
+{
+  "chainId": 11155111,
+  "recordedAtUtc": "2026-10-06T07:10:43.9749151Z",
+  "deployer": "0x879690fc881fd4de83b87a97d97848d9be337dcc",
+  "deployment": "complete",
+  "vaultMinterRole": "confirmed",
+  "contracts": {
+    "MockUSDC": {
+      "address": "0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc",
+      "transactionHash": "0xae2cbdcde13af1b8a33f790ea7ef59ffeebb68c55b48b626bdc21b6f593651a3",
+      "deployment": "confirmed",
+      "verification": "verified",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc#code"
+    },
+    "SimpleStablecoin": {
+      "address": "0xdbc37a8762e1ba519b196f289ce89833a1d721f0",
+      "transactionHash": "0x4eaf3aeb38a08d3a2483e8393c15c05681f725b51628dd74800da1668c3f4007",
+      "deployment": "confirmed",
+      "verification": "verified",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0xdbc37a8762e1ba519b196f289ce89833a1d721f0#code"
+    },
+    "Vault": {
+      "address": "0x1886bab8801f805111ff5921eb6dfe77873ba077",
+      "transactionHash": "0xa073d65081a4b993f23d20534bacb8b44fa71bbac9fe119c7ee1a67a44b938a0",
+      "deployment": "confirmed",
+      "verification": "verified",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0x1886bab8801f805111ff5921eb6dfe77873ba077#code"
+    }
+  },
+  "transactions": [
+    {
+      "hash": "0xae2cbdcde13af1b8a33f790ea7ef59ffeebb68c55b48b626bdc21b6f593651a3",
+      "contract": "MockUSDC",
+      "status": "confirmed"
+    },
+    {
+      "hash": "0x4eaf3aeb38a08d3a2483e8393c15c05681f725b51628dd74800da1668c3f4007",
+      "contract": "SimpleStablecoin",
+      "status": "confirmed"
+    },
+    {
+      "hash": "0xa073d65081a4b993f23d20534bacb8b44fa71bbac9fe119c7ee1a67a44b938a0",
+      "contract": "Vault",
+      "status": "confirmed"
+    },
+    {
+      "hash": "0x22cee12193c26c98b3bcb9e37bf0fcf9d49170aa5d8eb98acaddc993ce0a737d",
+      "contract": "SimpleStablecoin",
+      "status": "confirmed"
+    }
+  ]
+}

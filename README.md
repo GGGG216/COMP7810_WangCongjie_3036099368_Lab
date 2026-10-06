@@ -6,7 +6,7 @@ Submission repository: [GGGG216/COMP7810_WangCongjie_3036099368_Lab](https://git
 
 Completed from [hgwoops/stablecoin-lab-2026](https://github.com/hgwoops/stablecoin-lab-2026), upstream commit [`971ae77107f750153208c495bb000673c9560403`](https://github.com/hgwoops/stablecoin-lab-2026/tree/971ae77107f750153208c495bb000673c9560403). This lab demonstrates collateral accounting, mint/redeem permissions, liquidation, and the limits of a stablecoin's backing invariant.
 
-**Ex0–Ex6 and the optional Ex7 challenge are complete.** The full Foundry run reports **44 passed, 0 failed, 0 skipped across 6 suites**. Both invariant properties passed in a grouped invariant result: 256 runs at depth 500, totaling 128,000 handler calls with zero reverts. The recorded deployment uses local Anvil. **Tier 2 Sepolia deployment and Etherscan verification are pending:** a test-ETH-funded wallet and verification credentials have not yet been configured. This pending item is listed separately so local evidence is not mistaken for testnet deployment evidence.
+**Ex0–Ex6, Tier 2 Sepolia deployment, and the optional Ex7 challenge are complete.** The full Foundry run reports **44 passed, 0 failed, 0 skipped across 6 suites**. Both invariant properties passed in a grouped invariant result: 256 runs at depth 500, totaling 128,000 handler calls with zero reverts. Local Anvil evidence demonstrates the Ex3 backing failure. All three Sepolia contracts have verified source on Etherscan; the four deployment/role-grant transactions and the vault's minting role were independently checked on-chain. See [public Sepolia evidence](evidence/sepolia.json) and the links below. Moodle upload remains the student's final step.
 
 ## Run on Windows
 
@@ -46,7 +46,38 @@ forge test -vv  # all suites
 
 See [EXERCISES.md](EXERCISES.md) for the original task descriptions and individual CLI commands.
 
-## Tier 2 — Sepolia deployment and verification (pending credentials)
+## Tier 2 — Sepolia deployment and verification (complete)
+
+Network: Ethereum Sepolia, chain ID `11155111`.
+Deployer/admin: `0x879690fc881fd4de83b87a97d97848d9be337dcc`.
+
+| Contract | Address and verified source |
+|---|---|
+| MockUSDC | [0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc](https://sepolia.etherscan.io/address/0xfec4bbd016d4c385dfd9b5de2637674d6d2bf9cc#code) |
+| SimpleStablecoin | [0xdbc37a8762e1ba519b196f289ce89833a1d721f0](https://sepolia.etherscan.io/address/0xdbc37a8762e1ba519b196f289ce89833a1d721f0#code) |
+| Vault | [0x1886bab8801f805111ff5921eb6dfe77873ba077](https://sepolia.etherscan.io/address/0x1886bab8801f805111ff5921eb6dfe77873ba077#code) |
+
+These are the submission contracts; do not redeploy them. The instructions below
+document reproduction with a separate test wallet/project copy.
+
+### Deploy using MetaMask without exporting a private key
+
+After compiling the lab, run `python scripts/metamask-deploy.py`. Open
+`http://127.0.0.1:18547/` in the browser containing MetaMask, select Sepolia,
+connect, then click **Deploy / resume on Sepolia**. Review and approve the four
+requests: three contract creations and one grant of `MINTER_ROLE` to Vault.
+The requests transfer zero ETH; fees use Sepolia test ETH. Public transaction
+hashes are retained under ignored `tmp/` so an interrupted run can resume.
+The local server independently checks the chain, sender, creation bytecode,
+constructor arguments, receipts, and minter role before saving public evidence.
+
+Set `ETHERSCAN_API_KEY` and `SEPOLIA_RPC_URL` in the ignored `.env`, then run
+`./scripts/deploy-sepolia.ps1 -Mode VerifyOnly`. This step requires no wallet
+private key and does not submit wallet transactions. Evidence-validation tests:
+`python -m unittest discover -s test -p test_metamask_deploy.py -v` (11 tests).
+The page's transaction checks are covered by `node test/metamask-page.test.cjs`.
+
+### Alternative: CLI deployment with a dedicated test key
 
 Fill `PRIVATE_KEY`, `SEPOLIA_RPC_URL`, and `ETHERSCAN_API_KEY` in the ignored local `.env` file, using [.env.example](.env.example) as the template. The wallet must contain Sepolia test ETH. Keep the private key and API key out of the repository and screenshots.
 
@@ -60,7 +91,7 @@ The helper checks for Ethereum Sepolia chain ID `11155111`, rejects zero and kno
 .\scripts\deploy-sepolia.ps1 -Mode VerifyOnly
 ```
 
-Existing deployment records prevent accidental redeployment. An interrupted or partial broadcast must be inspected and resumed separately. The helper's syntax and credential rejection were checked locally; live Sepolia deployment and verification have **not** been executed. Once they succeed, add the generated public evidence and update this pending status before the final course submission.
+Existing deployment records prevent accidental redeployment. An interrupted or partial broadcast must be inspected and resumed separately. This submission was deployed through MetaMask and verified using the helper's `VerifyOnly` mode. Public evidence includes the confirmed creation transactions and the successful grant of `MINTER_ROLE` to Vault. Wallet keys and API credentials are excluded from the repository and submission archive.
 
 ## Architecture
 

@@ -12,7 +12,7 @@ the Moodle text box as well.
 |---|---:|---|---|
 | Ex0, Ex2, Ex4, Ex5, Ex6 and passing exercise tests | 40% | `src/`, `test/`, `evidence/forge-test.txt`, `evidence/doctor.txt` | Complete locally |
 | Ex3 screenshot: supply far above collateral | Required | `evidence/ex3.png`, matching transcript and receipts | Complete locally |
-| Sepolia deployment and Etherscan verification | 20% | Three public addresses and source links still needed | Pending |
+| Sepolia deployment and Etherscan verification | 20% | `evidence/sepolia.json`; three verified source links in README and generated Moodle text | Complete |
 | A-D answers, 150-300 words per answer; E table and scenario | 25% | `STUDENT-QUESTIONS.md` | Complete |
 | Naming, explanatory comments, architecture in README | 15% | `README.md`, contracts and tests | Complete |
 
@@ -24,12 +24,13 @@ the graded Sepolia deployment. No grade is guaranteed by this checklist.
 Run from the project root:
 
 ```powershell
-python scripts\package-submission.py
+python scripts\package-submission.py --final
 ```
 
-This creates `output/submission/COMP7810_WangCongjie_3036099368_Lab_DRAFT.zip`, a
-Moodle text draft, and a package report. The draft is deliberately marked
-incomplete while Tier 2 is pending.
+This creates `output/submission/COMP7810_WangCongjie_3036099368_Lab.zip`,
+`MOODLE_TEXT.txt`, and `PACKAGE_REPORT.json`. Use the final ZIP without a
+`_DRAFT` suffix. The final option requires confirmed deployments, the vault's
+minting role, and successful source verification for all three contracts.
 
 Use this generated archive, not GitHub's source ZIP or a ZIP of the whole working
 folder: those alternatives can include dependency key fixtures or local secrets.
@@ -49,24 +50,16 @@ every possible encoded secret; do not add screenshots containing wallet keys.
 
 ## What is still needed from you
 
-1. Prepare a throwaway wallet funded with **Sepolia test ETH** and an Etherscan
-   API key. Configure `PRIVATE_KEY`, `SEPOLIA_RPC_URL`, and `ETHERSCAN_API_KEY`
-   only in the ignored local `.env` file. Do not paste keys into chat or Moodle.
-2. Tell Codex the configuration is ready. The deployment helper can deploy all
-   three contracts, verify their source, and save public `evidence/sepolia.json`.
-   A failed source verification can be retried with
-   `scripts/deploy-sepolia.ps1 -Mode VerifyOnly` without redeployment.
-3. After successful verification, update the pending status in the README and
-   this checklist, then build the final archive with:
+1. Review the answers and code so you can explain your submission. Follow the
+   course's rules for acknowledging assistance and complete any declaration yourself.
+2. Log in to the course Moodle assignment and upload the **final ZIP** from
+   `output/submission/` (the file without `_DRAFT` in its name).
+3. Paste the contents of `output/submission/MOODLE_TEXT.txt` into Moodle's text
+   box. It contains the three Sepolia contract addresses and verified source links.
+4. Confirm the final submission and keep its receipt before **16 October 2026,
+   23:55**, using the timezone displayed by Moodle.
 
-   ```powershell
-   python scripts\package-submission.py --final
-   ```
+Deployment and Etherscan verification are complete. No additional ETH or wallet
+transactions are needed. No Moodle submission has been made.
 
-   The final option refuses missing/unverified Sepolia evidence. It generates
-   `MOODLE_TEXT.txt` with the three addresses and source links.
-4. Log in to the course Moodle assignment, upload the **final ZIP**, paste the
-   generated text, complete any required declaration yourself, and confirm the
-   submission receipt before the deadline. No Moodle submission has been made.
-
-Tier 2 status: PENDING
+Tier 2 status: COMPLETE
